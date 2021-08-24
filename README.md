@@ -1,2 +1,2 @@
-# detox
-16-bit language
+- Detox
+- 16-bit custom language, for fun mainly.
