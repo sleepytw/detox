@@ -43,27 +43,30 @@ class Build:
             mem.remove(mem[pAddr]); mem.remove(mem[p2-1]); mem.insert(p1-2, '0x-%s' % reg[p1]); mem.insert(p2-1, '0x-%s' % reg[p2])
 
 class Interpreter:
-    def __init__(self):
+    bL = list()
+    def __init__(self, bL):
         pass
+    
+    def sum(array, var: int):
+        for i in range(len(array)):
+            var+=array[i]
+        return var
 
-    def read(self, bL: list):
+    def read(self):
         with open('output.txt', 'r', encoding='utf-8') as ot:
-            data = ot.readline()
+            data = ot.readlines()
             for ln in data:
-                bL.append(ln)
+                self.bL.append(ln)
 
     def calc(self, total=0):
-        global elm
-        bls = bL[0]; rev=list(); cld=dict(); calcD = dict()
+        bls = self.bL[0]; rev=list(); calcD=dict()
         for evr in bls:
             rev.append(str(evr))
+        print(rev)
         for elm in range(len(rev)):
-            if rev[elm] == '0' or '-': cld[elm]='2'
-            elif rev[elm] == '1': cld[elm]='4'
+            if rev[elm] == '0': rev[elm]=2
+            elif rev[elm] == '-': rev[elm]=2
+            elif rev[elm] == '1': rev[elm]=4**2
             else: pass
-        cV2=list(int(cld.values()))
-        for ev in range(len(cV2)):
-            calcD[ev]=cV2[ev]**(ev-1)
-        cV3=list(int(calcD.values()))
-        for ite in cV3:
-            total+=(cV3[ite]/2); total/=16
+        for i in rev:
+            total+=sum(rev)
