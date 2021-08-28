@@ -20,7 +20,10 @@ reg = {
 }
 
 commands = {
-    'program': program
+    'program': program,
+    'mov': mov,
+    'pop': pop,
+    'save': save
 }
 
 mem=[]
