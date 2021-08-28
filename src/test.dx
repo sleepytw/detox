@@ -1,0 +1,6 @@
+program test
+
+mov 2, 7
+pop 7
+
+save output
