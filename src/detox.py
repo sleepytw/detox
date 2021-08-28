@@ -41,19 +41,19 @@ class InsufficientCodePass(Exception): pass
 class EvaluationGoneWrongOMG(Exception): pass
 
 class Build:
-    def __init__(self, eax, ebx):
-        self.eax = eax
-        self.ebx = ebx
+    # def __init__(self, eax, ebx):
+    #     self.eax = eax
+    #     self.ebx = ebx
 
-    def program(*args, **kwargs):
-        pass
+    # def program(*args, **kwargs):
+    #     pass
 
-    def mov(self): #move cell eax to ebx
+    def mov(self, eax, ebx): #move cell eax to ebx
         try:
-            if self.eax or self.ebx == None:
+            if eax or ebx == None:
                 raise InsufficientParameters
             else:
-                mem.insert(self.ebx, '%s  |  %s' % (mem[self.ebx], mem[self.eax])); mem.remove(mem[self.eax]); mem.remove(mem[self.ebx]); mem.insert(self.eax, '-')
+                mem.insert(ebx, '%s  |  %s' % (mem[ebx], mem[eax])); mem.remove(mem[eax]); mem.remove(mem[ebx]); mem.insert(eax, '-')
         except InsufficientParameters:
             print('ParameterError: Falsely pointed parameters.')
 
@@ -70,28 +70,35 @@ class Build:
                     mem.remove(mem[addr]); mem.remove(mem[p2-1]); mem.insert(p1-2, '0x-%s' % reg[p1]); mem.insert(p2-1, '0x-%s' % reg[p2])
         except InsufficientParameters:
             print('ParameterError: Falsely pointed parameters.')
-    def save(*args, **kwargs):
-        pass
+            
+    # def save(*args, **kwargs):
+    #     pass
 
 init = Build()
 
 # HardCodedXD
 class Interpreter:
-    memLoc=[]
-    vars=[]
-    with open('test.dx', 'r', encoding='utf-8') as file:
-        data = file.readlines()
-        for i in data:
-            memLoc.append(i)
+    def __init__(self, memLoc: list, vars: list, bL: list, rev: list, calcD: dict):
+        self.memLoc = memLoc
+        self.vars = vars
+        self.bL = bL
+        self.rev = rev
+        self.calcD = calcD
 
-    def readData():
+    def readFile(self):
+        with open('test.dx', 'r', encoding='utf-8') as file:
+            data = file.readlines()
+            for i in data:
+                self.memLoc.append(i)
+
+    def readData(self):
         try:
-            if bool(memLoc):
+            if bool(self.memLoc):
                 raise InsufficientCodePass
             else:
                 try:
-                    if 'program' in memLoc[0]:
-                        programName = memLoc[0][7:]
+                    if 'program' in self.memLoc[0]:
+                        programName = self.memLoc[0][7:]
                         '''
                         Initialize the program function here *(...)
                         >.
@@ -99,33 +106,32 @@ class Interpreter:
                         >.
                         '''
                         try:
-                            for i in memLoc:
-                                if '' in memLoc:
-                                    memLoc.remove(memLoc[i])
-                            for k in memLoc:
-                                if 'mov' in memLoc:
-                                    movIndex = memLoc.index(memLoc[k])
-                                    init.mov(memLoc[movIndex][4:], memLoc[movIndex][5:len(memLoc[movIndex])])
-                            for j in memLoc:
-                                if 'pop' in memLoc:
-                                    popIndex = memLoc.index(memLoc[j])
-                                    init.pop(memLoc[popIndex][4:len(memLoc[popIndex])])
-                            if 'save' in memLoc:
-                                saveIndex = memLoc.index(memLoc[l])
-                                save(memLoc[saveIndex][5:len(memLoc[saveIndex])])
+                            for i in self.memLoc:
+                                if '' in self.memLoc:
+                                    self.memLoc.remove(self.memLoc[i])
+                            for k in self.memLoc:
+                                if 'mov' in self.memLoc:
+                                    movIndex = self.memLoc.index(self.memLoc[k])
+                                    init.mov(self.memLoc[movIndex][4:], self.memLoc[movIndex][5:len(self.memLoc[movIndex])])
+                            for j in self.memLoc:
+                                if 'pop' in self.memLoc:
+                                    popIndex = self.memLoc.index(self.memLoc[j])
+                                    init.pop(self.memLoc[popIndex][4:len(self.memLoc[popIndex])])
+                            # if 'save' in self.memLoc:
+                            #     init.save(self.memLoc[-1][5:len(self.memLoc[-1])])
                             else:
                                 raise UndefinedSavingPoint
                             try:
                                 for n in mem:
                                     if len(mem[n]) == 4:
-                                        vars.insert(n, '0')
+                                        self.vars.insert(n, '0')
                                     elif mem[n] == '-':
-                                        vars.insert(n, '0')
+                                        self.vars.insert(n, '0')
                                     elif len(mem[n]) > 4:
-                                        vars.insert(n, '1')
+                                        self.vars.insert(n, '1')
                                     else: pass
                                 with open('output.txt', 'w', encoding='utf-8') as ot:
-                                    for i in vars:
+                                    for i in self.vars:
                                         ot.write(i)
                             except:
                                 pass
@@ -138,12 +144,12 @@ class Interpreter:
         except InsufficientCodePass:
             print('CodeError: Empty file or something went wrong.')
 
-class Evaluate:
-    bL = list()
-    def __init__(self, bL):
-        pass
+# class Evaluate:
+#     bL = list()
+#     def __init__(self, bL):
+#         pass
 
-    def sum(array, var: int):
+    def sum(self, array, var: int):
         for i in range(len(array)):
             var+=array[i]
         return var
@@ -157,17 +163,17 @@ class Evaluate:
     def calc(self, total=0):
         for i in self.bL:
             if '' in self.bL[i]:
-                UIndex = memLoc.index(memLoc[l])
+                UIndex = self.memLoc.index(self.memLoc[i])
                 self.bL.remove(UIndex)
 
-        bls = self.bL[0]; rev=list(); calcD=dict()
+        bls = self.bL[0]#; rev=list(); calcD=dict()
         for evr in bls:
-            rev.append(str(evr))
-        print(rev)
-        for elm in range(len(rev)):
-            if rev[elm] == '0': rev[elm]=2
-            elif rev[elm] == '-': rev[elm]=2
-            elif rev[elm] == '1': rev[elm]=4**2
+            self.rev.append(str(evr))
+        print(self.rev)
+        for elm in range(len(self.rev)):
+            if self.rev[elm] == '0': self.rev[elm]=2
+            elif self.rev[elm] == '-': self.rev[elm]=2
+            elif self.rev[elm] == '1': self.rev[elm]=4**2
             else: pass
-        for i in rev:
-            total+=sum(rev)
+        for i in self.rev:
+            total+=sum(self.rev)
