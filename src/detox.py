@@ -19,12 +19,12 @@ reg = {
     16: 'F'
 }
 
-commands = {
-    'program': program,
-    'mov': mov,
-    'pop': pop,
-    'save': save
-}
+# commands = {
+#     'program': program,
+#     'mov': mov,
+#     'pop': pop,
+#     'save': save
+# }
 
 mem=[]
 cK=list(reg.keys()) #cache keys
@@ -44,6 +44,9 @@ class Build:
     def __init__(self, eax, ebx):
         self.eax = eax
         self.ebx = ebx
+
+    def program(*args, **kwargs):
+        pass
 
     def mov(self): #move cell eax to ebx
         try:
@@ -67,6 +70,8 @@ class Build:
                     mem.remove(mem[addr]); mem.remove(mem[p2-1]); mem.insert(p1-2, '0x-%s' % reg[p1]); mem.insert(p2-1, '0x-%s' % reg[p2])
         except InsufficientParameters:
             print('ParameterError: Falsely pointed parameters.')
+    def save(*args, **kwargs):
+        pass
 
 init = Build()
 
@@ -87,39 +92,41 @@ class Interpreter:
                 try:
                     if 'program' in memLoc[0]:
                         programName = memLoc[0][7:]
+                        '''
+                        Initialize the program function here *(...)
+                        >.
+                        >.
+                        >.
+                        '''
                         try:
                             for i in memLoc:
                                 if '' in memLoc:
                                     memLoc.remove(memLoc[i])
                             for k in memLoc:
                                 if 'mov' in memLoc:
-                                    movIndex[k] = memLoc.index(memLoc[k])
+                                    movIndex = memLoc.index(memLoc[k])
+                                    init.mov(memLoc[movIndex][4:], memLoc[movIndex][5:len(memLoc[movIndex])])
                             for j in memLoc:
                                 if 'pop' in memLoc:
-                                    popIndex[j] = memLoc.index(memLoc[j])
-                            for l in memLoc:
-                                if 'save' in memLoc:
-                                    saveIndex[l] = memLoc.index(memLoc[l])
-                                else:
-                                    raise UndefinedSavingPoint
+                                    popIndex = memLoc.index(memLoc[j])
+                                    init.pop(memLoc[popIndex][4:len(memLoc[popIndex])])
+                            if 'save' in memLoc:
+                                saveIndex = memLoc.index(memLoc[l])
+                                save(memLoc[saveIndex][5:len(memLoc[saveIndex])])
+                            else:
+                                raise UndefinedSavingPoint
                             try:
-                                init.mov(memLoc[movIndex][4:], memLoc[movIndex][5:len(memLoc[movIndex])])
-                                init.pop(memLoc[popIndex][4:len(memLoc[popIndex])])
-                                #save(memLoc[saveIndex][5:len(memLoc[saveIndex])])
-                                try:
-                                    for n in mem:
-                                        if len(mem[n]) == 4:
-                                            vars.insert(n, '0')
-                                        elif len(mem[n]) == '-':
-                                            vars.insert(n, '0')
-                                        elif len(mem[n]) > 4:
-                                            vars.insert(n, '1')
-                                        else: pass
-                                    with open('output.txt', 'w', encoding='utf-8') as ot:
-                                        for i in vars:
-                                            ot.write(i)
-                                except:
-                                    pass
+                                for n in mem:
+                                    if len(mem[n]) == 4:
+                                        vars.insert(n, '0')
+                                    elif mem[n] == '-':
+                                        vars.insert(n, '0')
+                                    elif len(mem[n]) > 4:
+                                        vars.insert(n, '1')
+                                    else: pass
+                                with open('output.txt', 'w', encoding='utf-8') as ot:
+                                    for i in vars:
+                                        ot.write(i)
                             except:
                                 pass
                         except UndefinedSavingPoint:
