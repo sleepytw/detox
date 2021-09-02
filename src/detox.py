@@ -1,5 +1,7 @@
 #Detox -> 16-bit language by .S L E E P Y'
 
+import os
+
 reg = {
     1: '1',
     2: '2',
@@ -26,6 +28,8 @@ reg = {
 #     'save': save
 # }
 
+path=os.path.dirname(os.path.abspath(__file__))
+filePath=os.path.join(path, 'test.dx') # Later i will make it inherit the name of the file u run it with
 mem=[]
 cK=list(reg.keys()) #cache keys
 cV=list(reg.values()) #cache values
@@ -50,24 +54,24 @@ class Build:
 
     def mov(self, eax, ebx): #move cell eax to ebx
         try:
-            if eax or ebx == None:
-                raise InsufficientParameters
-            else:
+            if eax or ebx in cV:
                 mem.insert(ebx, '%s  |  %s' % (mem[ebx], mem[eax])); mem.remove(mem[eax]); mem.remove(mem[ebx]); mem.insert(eax, '-')
+            else:
+                raise InsufficientParameters
         except InsufficientParameters:
             print('ParameterError: Falsely pointed parameters.')
 
     def pop(self, addr): #addr is the cell you want you to pop
         try:
-            if addr == None:
-                raise InsufficientParameters
-            else:
+            if str(addr) in cV:
                 if addr < 11:
                     p1=mem[addr][:5]; p1=p1.replace('0x-', ''); p2=mem[addr][12:]; p2=p2.replace('0x-', ''); p1=int(p1); p2=int(p2)
                     mem.remove(mem[addr]); mem.remove(mem[p2-1]); mem.insert(p1-2, '0x-%s' % p1); mem.insert(p2-1, '0x-%s' % p2)
                 else:
                     p1=mem[addr][:4]; p1=p1.replace('0x-', ''); p2=mem[addr][12:]; p2=p2.replace('0x-', ''); p1=cK[cV.index(p1)]; p2=cK[cV.index(p2)]
                     mem.remove(mem[addr]); mem.remove(mem[p2-1]); mem.insert(p1-2, '0x-%s' % reg[p1]); mem.insert(p2-1, '0x-%s' % reg[p2])
+            else:
+                raise InsufficientParameters
         except InsufficientParameters:
             print('ParameterError: Falsely pointed parameters.')
             
@@ -86,14 +90,14 @@ class Interpreter:
         self.calcD = calcD
 
     def readFile(self):
-        with open('test.dx', 'r', encoding='utf-8') as file:
+        with open(filePath, 'r', encoding='utf-8') as file:
             data = file.readlines()
             for i in data:
-                self.memLoc.append(i)
+                self.memLoc.append(i.strip('\n'))
 
     def readData(self):
         try:
-            if bool(self.memLoc):
+            if not bool(self.memLoc):
                 raise InsufficientCodePass
             else:
                 try:
@@ -107,20 +111,20 @@ class Interpreter:
                         '''
                         try:
                             for i in self.memLoc:
-                                if '' in self.memLoc:
+                                if i == None:
                                     self.memLoc.remove(self.memLoc[i])
-                            for k in self.memLoc:
-                                if 'mov' in self.memLoc:
+                            for k in range(len(self.memLoc)):
+                                if 'mov' in self.memLoc[k]:
                                     movIndex = self.memLoc.index(self.memLoc[k])
-                                    init.mov(self.memLoc[movIndex][4:], self.memLoc[movIndex][5:len(self.memLoc[movIndex])])
-                            for j in self.memLoc:
-                                if 'pop' in self.memLoc:
+                                    init.mov(int(self.memLoc[movIndex][4:5]), int(self.memLoc[movIndex][7]))
+                            for j in range(len(self.memLoc)):
+                                if 'pop' in self.memLoc[j]:
                                     popIndex = self.memLoc.index(self.memLoc[j])
-                                    init.pop(self.memLoc[popIndex][4:len(self.memLoc[popIndex])])
+                                    init.pop(int(self.memLoc[popIndex][4:]))
                             # if 'save' in self.memLoc:
                             #     init.save(self.memLoc[-1][5:len(self.memLoc[-1])])
-                            else:
-                                raise UndefinedSavingPoint
+                            #else:
+                                #raise UndefinedSavingPoint
                             try:
                                 for n in mem:
                                     if len(mem[n]) == 4:
@@ -177,3 +181,7 @@ class Interpreter:
             else: pass
         for i in self.rev:
             total+=sum(self.rev)
+
+interpreter = Interpreter([], [], [], [], {})
+interpreter.readFile()
+interpreter.readData()
