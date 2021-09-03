@@ -38,11 +38,11 @@ for bit in reg:
     mem.append('0x-%s' % reg[bit])
 
 #Traceback errors (Exceptions)
-class ProgramNotPointed(Exception): pass
-class InsufficientParameters(Exception): pass
-class UndefinedSavingPoint(Exception): pass
-class InsufficientCodePass(Exception): pass
-class EvaluationGoneWrongOMG(Exception): pass
+class ProgramError(Exception): pass
+class ParameterError(Exception): pass
+class SaveError(Exception): pass
+class CodeError(Exception): pass
+class EvaluationGoneWrongLOLXDDDD(Exception): pass
 
 class Build:
     # def __init__(self, eax, ebx):
@@ -52,16 +52,16 @@ class Build:
     # def program(*args, **kwargs):
     #     pass
 
-    def mov(self, eax, ebx): #move cell eax to ebx
+    def mov(self, eax: int, ebx: int): #move cell eax to ebx
         try:
             if eax or ebx in cV:
                 mem.insert(ebx, '%s  |  %s' % (mem[ebx], mem[eax])); mem.remove(mem[eax]); mem.remove(mem[ebx]); mem.insert(eax, '-')
             else:
-                raise InsufficientParameters
-        except InsufficientParameters:
-            print('ParameterError: Falsely pointed parameters.')
+                raise ParameterError
+        except ParameterError:
+            print('ParameterError: Parameters not found and/or cannot convert str to int.')
 
-    def pop(self, addr): #addr is the cell you want you to pop
+    def pop(self, addr: int): #addr is the cell you want you to pop
         try:
             if str(addr) in cV:
                 if addr < 11:
@@ -71,10 +71,10 @@ class Build:
                     p1=mem[addr][:4]; p1=p1.replace('0x-', ''); p2=mem[addr][12:]; p2=p2.replace('0x-', ''); p1=cK[cV.index(p1)]; p2=cK[cV.index(p2)]
                     mem.remove(mem[addr]); mem.remove(mem[p2-1]); mem.insert(p1-2, '0x-%s' % reg[p1]); mem.insert(p2-1, '0x-%s' % reg[p2])
             else:
-                raise InsufficientParameters
-        except InsufficientParameters:
-            print('ParameterError: Falsely pointed parameters.')
-            
+                raise ParameterError
+        except ParameterError:
+            print('ParameterError: Parameters not found and/or cannot convert str to int.')
+
     # def save(*args, **kwargs):
     #     pass
 
@@ -98,17 +98,12 @@ class Interpreter:
     def readData(self):
         try:
             if not bool(self.memLoc):
-                raise InsufficientCodePass
+                raise CodeError
             else:
                 try:
                     if 'program' in self.memLoc[0]:
                         programName = self.memLoc[0][7:]
-                        '''
-                        Initialize the program function here *(...)
-                        >.
-                        >.
-                        >.
-                        '''
+                        #Initialize the program function here *(...)
                         try:
                             for i in self.memLoc:
                                 if i == None:
@@ -124,7 +119,7 @@ class Interpreter:
                             # if 'save' in self.memLoc:
                             #     init.save(self.memLoc[-1][5:len(self.memLoc[-1])])
                             #else:
-                                #raise UndefinedSavingPoint
+                                #raise SaveError
                             try:
                                 for n in mem:
                                     if len(mem[n]) == 4:
@@ -139,14 +134,14 @@ class Interpreter:
                                         ot.write(i)
                             except:
                                 pass
-                        except UndefinedSavingPoint:
-                            print('SaveError: Undefined output position.')
+                        except SaveError:
+                            print('SaveError: Save location not given.')
                     else:
-                        raise ProgramNotPointed
-                except ProgramNotPointed:
-                    print('ProgramError: Program not initialized.')
-        except InsufficientCodePass:
-            print('CodeError: Empty file or something went wrong.')
+                        raise ProgramError
+                except ProgramError:
+                    print('ProgramError: Program not allocated correctly.')
+        except CodeError:
+            print('CodeError: The interpreter failed reading the file.')
 
 # class Evaluate:
 #     bL = list()
