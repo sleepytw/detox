@@ -1,2 +1,2 @@
 - Detox
-- 16-bit custom language from scratch, mainly for fun idk lol.
+- 16-bit language from scratch, mainly for fun idk xD.
