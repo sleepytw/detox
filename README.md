@@ -1,2 +1,2 @@
 - Detox
-- 16-bit language from scratch, mainly for fun idk xD.
+- Python language from scratch, mainly just for fun idk xD.
