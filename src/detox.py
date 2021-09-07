@@ -1,4 +1,4 @@
-#Detox -> 16-bit language by .S L E E P Y'
+#Detox -> python language from scratch by .S L E E P Y'
 
 import os
 
