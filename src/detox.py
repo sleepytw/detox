@@ -1,4 +1,4 @@
-#Detox -> python language from scratch by .S L E E P Y'
+#Detox -> python language from scratch by sleepy
 
 import os
 
@@ -28,9 +28,9 @@ reg = {
 #     'save': save
 # }
 
+mem=[]
 path=os.path.dirname(os.path.abspath(__file__))
 filePath=os.path.join(path, 'test.dx') # Later i will make it inherit the name of the file u run it with
-mem=[]
 cK=list(reg.keys()) #cache keys
 cV=list(reg.values()) #cache values
 
@@ -82,42 +82,44 @@ init = Build()
 
 # HardCodedXD
 class Interpreter:
-    def __init__(self, memLoc: list, vars: list, bL: list, rev: list, calcD: dict):
-        self.memLoc = memLoc
+    def __init__(self, memcache: list, vars: list, storage: list, bits: list, temp: dict):
+        self.memcache = memcache
         self.vars = vars
-        self.bL = bL
-        self.rev = rev
-        self.calcD = calcD
+        self.storage = storage
+        self.bits = bits
+        self.temp = temp
 
     def readFile(self):
         with open(filePath, 'r', encoding='utf-8') as file:
             data = file.readlines()
             for i in data:
-                self.memLoc.append(i.strip('\n'))
+                self.memcache.append(i.strip('\n'))
 
     def readData(self):
         try:
-            if not bool(self.memLoc):
+            if not bool(self.memcache):
                 raise CodeError
             else:
                 try:
-                    if 'program' in self.memLoc[0]:
-                        programName = self.memLoc[0][7:]
+                    if 'program' in self.memcache[0]:
+                        programName = self.memcache[0][7:]
                         #Initialize the program function here *(...)
                         try:
-                            for i in self.memLoc:
+                            for i in self.memcache:
                                 if i == None:
-                                    self.memLoc.remove(self.memLoc[i])
-                            for k in range(len(self.memLoc)):
-                                if 'mov' in self.memLoc[k]:
-                                    movIndex = self.memLoc.index(self.memLoc[k])
-                                    init.mov(int(self.memLoc[movIndex][4:5]), int(self.memLoc[movIndex][7]))
-                            for j in range(len(self.memLoc)):
-                                if 'pop' in self.memLoc[j]:
-                                    popIndex = self.memLoc.index(self.memLoc[j])
-                                    init.pop(int(self.memLoc[popIndex][4:]))
-                            # if 'save' in self.memLoc:
-                            #     init.save(self.memLoc[-1][5:len(self.memLoc[-1])])
+                                    self.memcache.remove(self.memcache[i])
+                            for k in range(len(self.memcache)):
+                                if 'mov' in self.memcache[k]:
+                                    movIndex = self.memcache.index(self.memcache[k])
+                                    init.mov(int(self.memcache[movIndex][4:5]), int(self.memcache[movIndex][7]))
+                            print(mem)
+                            for j in range(len(self.memcache)):
+                                if 'pop' in self.memcache[j]:
+                                    popIndex = self.memcache.index(self.memcache[j])
+                                    init.pop(int(self.memcache[popIndex][4:]))
+                            print(mem)
+                            # if 'save' in self.memcache:
+                            #     init.save(self.memcache[-1][5:len(self.memcache[-1])])
                             #else:
                                 #raise SaveError
                             try:
@@ -129,9 +131,9 @@ class Interpreter:
                                     elif len(mem[n]) > 4:
                                         self.vars.insert(n, '1')
                                     else: pass
-                                with open('output.txt', 'w', encoding='utf-8') as ot:
+                                with open('output.txt', 'w', encoding='utf-8') as output:
                                     for i in self.vars:
-                                        ot.write(i)
+                                        output.write(i)
                             except:
                                 pass
                         except SaveError:
@@ -139,13 +141,13 @@ class Interpreter:
                     else:
                         raise ProgramError
                 except ProgramError:
-                    print('ProgramError: Program not allocated correctly.')
+                    print('ProgramError: Program not allocated correctly. \n/!\ Check if its first in the code, if not, move it there.')
         except CodeError:
-            print('CodeError: The interpreter failed reading the file.')
+            print('CodeError: The interpreter failed reading the file. \n/!\ Check if its last in the code, if not, move it there.')
 
 # class Evaluate:
-#     bL = list()
-#     def __init__(self, bL):
+#     storage = list()
+#     def __init__(self, storage):
 #         pass
 
     def sum(self, array, var: int):
@@ -156,26 +158,26 @@ class Interpreter:
     def readOutput(self):
         with open('output.txt', 'r', encoding='utf-8') as ot:
             data = ot.readlines()
-            for ln in data:
-                self.bL.append(ln)
+            for line in data:
+                self.storage.append(line)
 
-    def calc(self, total=0):
-        for i in self.bL:
-            if '' in self.bL[i]:
-                UIndex = self.memLoc.index(self.memLoc[i])
-                self.bL.remove(UIndex)
+    def calculate(self, total=0):
+        for i in self.storage:
+            if '' in self.storage[i]:
+                UIndex = self.memcache.index(self.memcache[i])
+                self.storage.remove(UIndex)
 
-        bls = self.bL[0]#; rev=list(); calcD=dict()
-        for evr in bls:
-            self.rev.append(str(evr))
-        print(self.rev)
-        for elm in range(len(self.rev)):
-            if self.rev[elm] == '0': self.rev[elm]=2
-            elif self.rev[elm] == '-': self.rev[elm]=2
-            elif self.rev[elm] == '1': self.rev[elm]=4**2
+        storageA = self.storage[0]#; bits=list(); temp=dict()
+        for each in storageA:
+            self.bits.append(str(each))
+        print(self.bits)
+        for element in range(len(self.bits)):
+            if self.bits[element] == '0': self.bits[element]=2
+            elif self.bits[element] == '-': self.bits[element]=2
+            elif self.bits[element] == '1': self.bits[element]=4**2
             else: pass
-        for i in self.rev:
-            total+=sum(self.rev)
+        for _ in self.bits:
+            total+=sum(self.bits)
 
 interpreter = Interpreter([], [], [], [], {})
 interpreter.readFile()
